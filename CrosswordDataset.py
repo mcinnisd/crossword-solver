@@ -14,7 +14,7 @@ class Clue:
 		return f"{self.index}. ({self.direction}) {self.question} ({self.length} letters): {self.answer}"
 
 class CrosswordDataset:
-	def __init__(self, year, month, day, sorted=False):
+	def __init__(self, year, month, day, ifsorted=False):
 		self.year = year
 		self.month = month
 		self.day = day
@@ -24,7 +24,7 @@ class CrosswordDataset:
 		self.clues = self.collect_clues()
 		self.correct_guesses = 0
 
-		if sorted:
+		if ifsorted:
 			self.clues = sorted(self.clues, key=lambda x: x.length)
 			
 		self.locations = self.find_locations()

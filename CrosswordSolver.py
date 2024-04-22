@@ -105,7 +105,7 @@ if __name__ == "__main__":
 	year = "2018"
 	month = "03"
 	day = "09"
-	crossword = CrosswordDataset(year, month, day)
+	crossword = CrosswordDataset(year, month, day, ifsorted=True)
 
 	crossword.print_title()
 
