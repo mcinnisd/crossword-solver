@@ -22,6 +22,7 @@ class CrosswordDataset:
 		self.rows = self.crossword_data['size']['rows']
 		self.cols = self.crossword_data['size']['cols']
 		self.clues = self.collect_clues()
+		self.correct_guesses = 0
 
 		if sorted:
 			self.clues = sorted(self.clues, key=lambda x: x.length)
