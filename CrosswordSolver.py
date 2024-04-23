@@ -95,16 +95,16 @@ class Guess:
 
 	def get_first(self, word):
 		# Split the word into individual characters
-		characters = word.split()
+		# characters = word.split()
 
-		# Remove any spaces
-		characters = [char.strip() for char in characters]
+		# # Remove any spaces
+		# characters = [char.strip() for char in characters]
 
 		# Check if the first character is a dash
-		if characters[0] == '-':
+		if word[0] == '-':
 			first_char = None
 		else:
-			first_char = characters[0]
+			first_char = word[0]
 		return first_char
 		# 	last_char = characters[-1]
 		# elif characters[-1] == '-':
