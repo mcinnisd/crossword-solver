@@ -14,7 +14,7 @@ def request_guesses(input_clue):
 	client = OpenAI(api_key=api_key)
 
 	completion = client.chat.completions.create(
-		model="gpt-3.5-turbo",
+		model="gpt-4-turbo",
 		messages=[
 			{"role": "system", "content": "As a seasoned crossword puzzle enthusiast, your expertise lies in crafting accurate solutions based on provided clues. Your knack for generating answers shines through as you consistently offer a curated selection of possibilities that align with the given criteria. Your objective is to reliably present five potential solutions, neatly organized in JSON format under the key 'guesses'.\nIncoming requests adhere strictly to a standardized JSON format:\nClue: A string representing the given clue. \nLength: The length of the target word. \nknown_characters: A string indicating known characters in the word. Unknown characters are denoted by '-', while known characters are represented as themselves. \n This standardized format ensures seamless communication between users and the API, facilitating efficient query processing and response generation."},
 			{"role": "user", "content": input_clue}
@@ -29,7 +29,7 @@ def request_guesses(input_clue):
 
 	cleaned_guesses = [guess.replace(" ", "").upper() for guess in guesses]
 
-	print(f'Guesses: {cleaned_guesses}')
+	# print(f'Guesses: {cleaned_guesses}')
 
 	return cleaned_guesses
 
@@ -45,8 +45,8 @@ class Guess:
 		self.guesses = []
 		self.previous_guesses = [] # keep track of previous?
 		# self.probablities # maybe the guesses are a tuple?
-		# print(f'Clue question: {clue.question}')
-		# print(f'Answer: {clue.answer}')
+		print(f'Clue question: {clue.question}')
+		print(f'Answer: {clue.answer}')
 		self.make_guess(crossword)
 
 		# return self.test(crossword)
@@ -61,6 +61,8 @@ class Guess:
             "known_characters": known_characters
         })
 
+		# I THINK THAT THE BEST CHARACTERS SHOULD BE GOTTEN RID OF IT DOESNT SEEM TO PROVE USEFUL IF THE WRONG PATH IS TAKEN
+
 		return request_guesses(input_clue)
 
 	def make_guess(self, crossword):
@@ -68,6 +70,8 @@ class Guess:
 		# print(f'Known Letters: {known_characters}')
 
 		self.guesses = self.generate_guess(known_characters)
+
+		print(f'Guesses: {self.guesses}')
 
 		valid_guesses = []
 		for guess in self.guesses:
@@ -77,16 +81,16 @@ class Guess:
 		# if there are any valid guesses insert it (should have something like if there isnt this will be appended to the stack, queue of guessing)
 		if valid_guesses:
 			best_guess = valid_guesses[0]
-			print(f'Guess: {best_guess.upper()} Answer: {self.answer.upper()}')
+			# print(f'Guess: {best_guess.upper()} Answer: {self.answer.upper()}')
 			if best_guess.upper() == self.answer.upper():
 				crossword.correct_guesses += 1
 				print('Correct guess!')
 		
 			crossword.grid_insert(best_guess, self.location, self.direction)
-			print('Inserted!') # just for debugging as of now
+			print('Inserted!\n') # just for debugging as of now
 			# self.previous_guesses.append((clue, valid_guesses[0]))
 		else:
-			print('Doesn\'t fit') 
+			print('Doesn\'t fit\n') 
 
 	@staticmethod
 	def word_fits(word, known_letters):
@@ -105,7 +109,8 @@ if __name__ == "__main__":
 	year = "2018"
 	month = "03"
 	day = "09"
-	crossword = CrosswordDataset(year, month, day, ifsorted=True)
+	crossword = CrosswordDataset(year, month, day)
+	# crossword = CrosswordDataset(year, month, day, ifsorted=True)
 
 	crossword.print_title()
 
