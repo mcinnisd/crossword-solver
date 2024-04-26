@@ -33,12 +33,20 @@ class CrosswordDataset:
 
 	def fetch_crossword_json(self):
 		url = f"https://raw.githubusercontent.com/doshea/nyt_crosswords/master/{self.year}/{self.month}/{self.day}.json"
-		response = requests.get(url)
-		if response.status_code == 200:
+		# response = requests.get(url)
+		# if response.status_code == 200:
+		# 	return response.json()
+		# else:
+		# 	print("Error fetching JSON:", response.status_code)
+		# 	return None
+		try:
+			response = requests.get(url)
+			response.raise_for_status()  # This will raise an HTTPError if the HTTP request returned an unsuccessful status code
 			return response.json()
-		else:
-			print("Error fetching JSON:", response.status_code)
-			return None
+		except requests.exceptions.HTTPError as http_err:
+			raise RuntimeError(f"HTTP error occurred: {http_err}") from http_err
+		except requests.exceptions.RequestException as e:
+			raise RuntimeError(f"Error fetching data: {e}") from e
 
 	def collect_clues(self):
 		clues = []
@@ -158,11 +166,11 @@ if __name__ == "__main__":
 	# 	print(f'Clue number: {number} Position: {location}')
 
 	# Tests inserting into the solving grid given the word, location, and direction
-	# for clue in crossword.clues:
+	for clue in crossword.clues:
 
-	# 	crossword.grid_insert(clue.answer, crossword.locations[clue.index], clue.direction)
+		crossword.grid_insert(clue.answer, crossword.locations[clue.index], clue.direction)
 
-	# 	crossword.print_grid(crossword.grid) # this grid should look the same as the solved grid now
+		crossword.print_grid(crossword.grid) # this grid should look the same as the solved grid now
 		
 	# Testing extracting a word given a location, length, and direction
 	# word = crossword.grid_extract(location, clue.length, clue.direction)
