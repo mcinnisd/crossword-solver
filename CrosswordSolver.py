@@ -231,27 +231,25 @@ if __name__ == "__main__":
 	# print(get_prompt(True))
 	# print(f'Using Known? {crossword.use_known}')
 	# crossword.use_known = True
-	# for clue in crossword.clues:
-	# 	Guess(crossword, clue)
+	for clue in crossword.clues:
+		Guess(crossword, clue)
 
-	# crossword.use_known = True
-	# for _ in range(7):
-	# 	crossword.print_grid(crossword.grid)
-	# 	print(f'Correct guesses: {crossword.correct_guesses} out of {len(crossword.clues)}')
-	# 	crossword.correct_guesses = 0
+	crossword.use_known = True
+	for _ in range(7):
+		crossword.print_grid(crossword.grid)
+		print(f'Correct guesses: {crossword.correct_guesses} out of {len(crossword.clues)}')
+		crossword.correct_guesses = 0
 		
-	# 	for clue in crossword.clues:
-	# 		Guess(crossword, clue)
+		for clue in crossword.clues:
+			Guess(crossword, clue)
 
 
 	# clue = crossword.clues[0]
 	# # will need to have a stack or dictionary or something of these guesses and keep track if we have filled in something for a guess
 	# Guess(crossword, clue)
 
-	# crossword.print_grid(crossword.grid)
-	# print(f'Correct guesses: {crossword.correct_guesses} out of {len(crossword.clues)}')
+	crossword.print_grid(crossword.grid)
+	print(f'Correct guesses: {crossword.correct_guesses} out of {len(crossword.clues)}')
 
-
-	print(get_prompt(True))
 	# also should think about how we define the end state, easy if doing the stack harder if 
 
