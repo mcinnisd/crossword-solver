@@ -33,12 +33,7 @@ class CrosswordDataset:
 
 	def fetch_crossword_json(self):
 		url = f"https://raw.githubusercontent.com/doshea/nyt_crosswords/master/{self.year}/{self.month}/{self.day}.json"
-		# response = requests.get(url)
-		# if response.status_code == 200:
-		# 	return response.json()
-		# else:
-		# 	print("Error fetching JSON:", response.status_code)
-		# 	return None
+
 		try:
 			response = requests.get(url)
 			response.raise_for_status()  # This will raise an HTTPError if the HTTP request returned an unsuccessful status code
@@ -82,7 +77,6 @@ class CrosswordDataset:
 	def grid_extract(self, grid, location, length, direction):
 		row, col = location
 		index = row * self.cols + col
-		# grid = self.crossword_data['grid']
 		word = ""
 		# Check if the word fits within the grid horizontally
 		if direction == 'across':
@@ -97,7 +91,6 @@ class CrosswordDataset:
 		row, col = location
 		index = row * self.cols + col
 		grid = list(self.grid)
-
 		# Insert the word horizontally if it fits
 		if direction == 'across':
 			self.grid = grid[:index] + list(word) + grid[index + len(word):]
@@ -139,19 +132,12 @@ def random_puzzle(date_combinations_file):
 
 if __name__ == "__main__":
 
-	# Load a random puzzle
-	# date_combinations_file = 'date_combinations.csv'
-	# crossword = random_puzzle(date_combinations_file)
-
-	# Load a specific puzzle (for testing)
 	year = "2018"
 	month = "03"
 	day = "09"
 	crossword = CrosswordDataset(year, month, day) # Creates a datastructure for the crossword puzzle
 
-	# Printing out information for the given puzzle
 	crossword.print_title()
-	# crossword.print_size() # size of the puzzle
 
 	# crossword.print_grid(crossword.crossword_data['gridnums']) # Grid numbers and their locations
 	# crossword.print_grid(crossword.crossword_data['grid']) # Grid of the solved puzzle

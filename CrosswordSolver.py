@@ -45,9 +45,7 @@ def request_guesses(input_clue, use_known):
 	completion = client.chat.completions.create(
 		model="gpt-3.5-turbo", messages=message)
 	output = completion.choices[0].message
-	# print(f"Raw output: {output.content}")
-
-	# content = json.loads(output.content)
+	
 	try:
 		content = json.loads(output.content)
 	except json.decoder.JSONDecodeError as e:
@@ -65,13 +63,7 @@ def request_guesses(input_clue, use_known):
 	else:
 		guesses_list = []
 
-	# cleaned_guesses = [strip_non_letters(guess.upper()) for guess in guesses_list]
-	cleaned_guesses = [strip_non_letters(guess.upper()) if isinstance(guess, str) else '' for guess in guesses_list]
-
-
-	# print(f'Guesses: {cleaned_guesses}')
-
-	return cleaned_guesses
+	return [strip_non_letters(guess.upper()) if isinstance(guess, str) else '' for guess in guesses_list]
 
 class Guess:
 
@@ -82,38 +74,9 @@ class Guess:
 		self.question = clue.question
 		self.answer = clue.answer
 		self.length = clue.length
-		# self.use_known = False
 		self.guesses = []
-		# self.previous_guesses = [] # keep track of previous?
-		# self.probablities # maybe the guesses are a tuple?
-		# print(f'Clue question: {clue.question}')
-		# print(f'Answer: {clue.answer}')
 		self.make_guess(crossword)
 
-		# return self.test(crossword)
-
-
-	def get_first(self, word):
-		
-		# Check if the first character is a dash
-		if word[0] == '-':
-			first_char = None
-		else:
-			first_char = word[0]
-		return first_char
-		# return self.answer[0]
-
-		# 	last_char = characters[-1]
-		# elif characters[-1] == '-':
-		# 	first_char = characters[0]
-		# 	last_char = None
-		# else:
-		# 	first_char = characters[0]
-		# 	last_char = characters[-1]
-
-		# return first_char, last_char
-	# this should be the function interacting with the llm api it will use self.question and self.length here
-	# it will use those and known_letters (- if not) to prompt and return a list of values (perhaps probabilities too)
 	def generate_guess(self, known_characters, use_known):
 		# Placeholder implementation
 		if use_known:
@@ -122,23 +85,11 @@ class Guess:
 				"length": self.length,
 				"known_characters": known_characters
 			})
-			print(f'Known Char: {known_characters}')
-			# first_char = self.get_first(known_characters)
-			# print(f'First Char: {first_char}')
-			# input_clue = json.dumps({
-			# 	"clue": self.question,
-			# 	"length": self.length,
-			# 	"known_first": first_char
-			# })
 		else:
 			input_clue = json.dumps({
 				"clue": self.question,
-				"length": self.length,
-				# "known_characters": known_characters
+				"length": self.length
 			})
-
-
-		# I THINK THAT THE BEST CHARACTERS SHOULD BE GOTTEN RID OF IT DOESNT SEEM TO PROVE USEFUL IF THE WRONG PATH IS TAKEN
 
 		return request_guesses(input_clue, use_known)
 	
@@ -146,29 +97,18 @@ class Guess:
 		return any(char != '-' for char in word)
 
 	def check_insert(self, crossword):
-		print(f'Answer: {self.answer}')
-		print(f'Valid guesses: {self.guesses}')
 
 		for guess in self.guesses:
-			# print(f'Guess: {best_guess.upper()} Answer: {self.answer.upper()}')
-		
 			if guess.upper() == self.answer.upper():
 				crossword.correct_guesses += 1
 				crossword.grid_insert(guess.upper(), self.location, self.direction)
-				print('Correct guess!\n')
 				break
 
-				# print('None correct\n') 
-
-
-		# BELOW IS FOR INSERTION
-		# if there are any valid guesses insert it (should have something like if there isnt this will be appended to the stack, queue of guessing)
 		# if self.guesses:
 		# 	best_guess = self.guesses[0]
 		# 	# print(f'Guess: {best_guess.upper()} Answer: {self.answer.upper()}')
 		# 	if best_guess.upper() == self.answer.upper():
 		# 		crossword.correct_guesses += 1
-		# 		print('Correct guess!')
 		
 		# 	crossword.grid_insert(best_guess, self.location, self.direction)
 		# 	print('Inserted!\n') # just for debugging as of now
@@ -179,13 +119,10 @@ class Guess:
 	def make_guess(self, crossword):
 
 		known_characters = crossword.grid_extract(crossword.grid, self.location, self.length, self.direction)
-		# print(f'Known Letters: {known_characters}')
   
 		if '-' in known_characters:
 
 			self.guesses = self.generate_guess(known_characters, crossword.use_known)
-
-			# print(f'Guesses: {self.guesses}')
 
 			valid_guesses = []
 			for guess in self.guesses:
@@ -199,9 +136,6 @@ class Guess:
 
 			self.guesses = valid_guesses
 
-			# print(f'Guesses: {self.guesses}')
-
-			# if there are any valid guesses insert it (should have something like if there isnt this will be appended to the stack, queue of guessing)
 			self.check_insert(crossword)
 		else:
 			crossword.correct_guesses += 1
@@ -228,30 +162,21 @@ if __name__ == "__main__":
 	# crossword = CrosswordDataset(year, month, day, ifsorted=True)
 
 	crossword.print_title()
-	# print(get_prompt(True))
-	# print(f'Using Known? {crossword.use_known}')
-	# crossword.use_known = True
-	# for clue in crossword.clues:
-	# 	Guess(crossword, clue)
 
-	# crossword.use_known = True
-	# for _ in range(7):
-	# 	crossword.print_grid(crossword.grid)
-	# 	print(f'Correct guesses: {crossword.correct_guesses} out of {len(crossword.clues)}')
-	# 	crossword.correct_guesses = 0
+	for clue in crossword.clues:
+		Guess(crossword, clue)
+
+	crossword.use_known = True
+	for _ in range(7):
+		crossword.print_grid(crossword.grid)
+		print(f'Correct guesses: {crossword.correct_guesses} out of {len(crossword.clues)}')
+		crossword.correct_guesses = 0
 		
-	# 	for clue in crossword.clues:
-	# 		Guess(crossword, clue)
+		for clue in crossword.clues:
+			Guess(crossword, clue)
+
+	crossword.print_grid(crossword.grid)
+	print(f'Correct guesses: {crossword.correct_guesses} out of {len(crossword.clues)}')
 
 
-	# clue = crossword.clues[0]
-	# # will need to have a stack or dictionary or something of these guesses and keep track if we have filled in something for a guess
-	# Guess(crossword, clue)
-
-	# crossword.print_grid(crossword.grid)
-	# print(f'Correct guesses: {crossword.correct_guesses} out of {len(crossword.clues)}')
-
-
-	print(get_prompt(True))
-	# also should think about how we define the end state, easy if doing the stack harder if 
-
+	# tripple redundancy
